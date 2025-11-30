@@ -1,0 +1,22 @@
+{
+  "name": "tslox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "tslox": "dist/main.mjs"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/main.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "type": "module",
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
