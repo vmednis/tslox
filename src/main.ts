@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-import { name } from "@/test-import";
 
-console.log(`Welcome to ${name}!`);
+import TsLox from "@/tslox";
+await TsLox.main();

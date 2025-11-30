@@ -3,6 +3,7 @@
     "noEmit": true,
     "target": "ES2022",
     "module": "ESNext",
+    "types": ["node"],
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
