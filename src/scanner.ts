@@ -1,5 +1,5 @@
 import Token, { keywords, TokenType } from "@/token";
-import TsLox from "./tslox";
+import TsLox from "@/tslox";
 
 export default class Scanner {
     private tokens: Token[] = [];
