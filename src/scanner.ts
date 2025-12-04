@@ -89,7 +89,7 @@ export default class Scanner {
                 } else if(this.isAlpha(char)) {
                     this.identifier();
                 } else {
-                    TsLox.error(this.line, `Unexpected character.`);
+                    TsLox.scannerError(this.line, `Unexpected character.`);
                 }
                 break;
         }
@@ -124,7 +124,7 @@ export default class Scanner {
         }
         
         if(this.isAtEnd()) {
-            TsLox.error(this.line, "Unterminated string.");
+            TsLox.scannerError(this.line, "Unterminated string.");
             return;
         }
 
