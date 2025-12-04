@@ -12,7 +12,7 @@ export abstract class Expr {
         ) {
             super();
         }
-        
+
         accept<R>(visitor: ExprVisitor<R>): R {
             return visitor.visitBinaryExpr(this);
         }
@@ -24,7 +24,7 @@ export abstract class Expr {
         ) {
             super();
         }
-        
+
         accept<R>(visitor: ExprVisitor<R>): R {
             return visitor.visitGroupingExpr(this);
         }
@@ -36,7 +36,7 @@ export abstract class Expr {
         ) {
             super();
         }
-        
+
         accept<R>(visitor: ExprVisitor<R>): R {
             return visitor.visitLiteralExpr(this);
         }
@@ -49,7 +49,7 @@ export abstract class Expr {
         ) {
             super();
         }
-        
+
         accept<R>(visitor: ExprVisitor<R>): R {
             return visitor.visitUnaryExpr(this);
         }

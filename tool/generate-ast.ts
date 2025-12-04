@@ -86,7 +86,7 @@ function defineType(write: (indent: number, line: string) => void, baseName: str
     write(2, `) {`);
     write(3, `super();`);
     write(2, `}`);
-    write(2, ``);
+    write(0, ``);
     write(2, `accept<R>(visitor: ${baseName}Visitor<R>): R {`);
     write(3, `return visitor.visit${className}${baseName}(this);`);
     write(2, `}`);

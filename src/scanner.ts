@@ -7,10 +7,10 @@ export default class Scanner {
     private current = 0;
     private line = 1;
 
-    constructor(private readonly source: string) {}
+    constructor(private readonly source: string) { }
 
-    scanTokens() : Token[] {
-        while(!this.isAtEnd()) {
+    scanTokens(): Token[] {
+        while (!this.isAtEnd()) {
             // Scan next token
             this.start = this.current;
             this.scanToken();
@@ -26,18 +26,18 @@ export default class Scanner {
 
     private scanToken(): void {
         const char = this.advance();
-        switch(char) {
+        switch (char) {
             // Single-character tokens
-            case '(' : this.addToken(TokenType.LEFT_PAREN); break;
-            case ')' : this.addToken(TokenType.RIGHT_PAREN); break;
-            case '{' : this.addToken(TokenType.LEFT_BRACE); break;
-            case '}' : this.addToken(TokenType.RIGHT_BRACE); break;
-            case ',' : this.addToken(TokenType.COMMA); break;
-            case '.' : this.addToken(TokenType.DOT); break;
-            case '-' : this.addToken(TokenType.MINUS); break;
-            case '+' : this.addToken(TokenType.PLUS); break;
-            case ';' : this.addToken(TokenType.SEMICOLON); break;
-            case '*' : this.addToken(TokenType.STAR); break;
+            case '(': this.addToken(TokenType.LEFT_PAREN); break;
+            case ')': this.addToken(TokenType.RIGHT_PAREN); break;
+            case '{': this.addToken(TokenType.LEFT_BRACE); break;
+            case '}': this.addToken(TokenType.RIGHT_BRACE); break;
+            case ',': this.addToken(TokenType.COMMA); break;
+            case '.': this.addToken(TokenType.DOT); break;
+            case '-': this.addToken(TokenType.MINUS); break;
+            case '+': this.addToken(TokenType.PLUS); break;
+            case ';': this.addToken(TokenType.SEMICOLON); break;
+            case '*': this.addToken(TokenType.STAR); break;
 
             // One or two character tokens
             case '!':
@@ -61,14 +61,14 @@ export default class Scanner {
                 );
                 break;
             case '/':
-                if(this.match('/')) {
+                if (this.match('/')) {
                     // A comment goes until the end of the line
-                    while(this.peek() !== '\n' && !this.isAtEnd()) this.advance();
+                    while (this.peek() !== '\n' && !this.isAtEnd()) this.advance();
                 } else {
                     this.addToken(TokenType.SLASH);
                 }
                 break;
-            
+
             // Whitespace
             case ' ':
             case '\r':
@@ -80,13 +80,13 @@ export default class Scanner {
                 break;
 
             // Literals, identifiers, keywords
-            case '"' : this.string(); break;
+            case '"': this.string(); break;
 
             default:
-                if(this.isDigit(char)) {
+                if (this.isDigit(char)) {
                     // Number literal
                     this.number();
-                } else if(this.isAlpha(char)) {
+                } else if (this.isAlpha(char)) {
                     this.identifier();
                 } else {
                     TsLox.scannerError(this.line, `Unexpected character.`);
@@ -105,25 +105,25 @@ export default class Scanner {
     }
 
     private match(expected: string): boolean {
-        if(this.isAtEnd()) return false;
-        if(this.source.charAt(this.current) !== expected) return false;
+        if (this.isAtEnd()) return false;
+        if (this.source.charAt(this.current) !== expected) return false;
 
         this.current++;
         return true;
     }
 
     private peek(): string {
-        if(this.isAtEnd()) return '\0';
+        if (this.isAtEnd()) return '\0';
         return this.source.charAt(this.current);
     }
 
     private string(): void {
-        while(this.peek() !== '"' && !this.isAtEnd()) {
-            if(this.peek() === '\n') this.line++;
+        while (this.peek() !== '"' && !this.isAtEnd()) {
+            if (this.peek() === '\n') this.line++;
             this.advance();
         }
-        
-        if(this.isAtEnd()) {
+
+        if (this.isAtEnd()) {
             TsLox.scannerError(this.line, "Unterminated string.");
             return;
         }
@@ -141,14 +141,14 @@ export default class Scanner {
     }
 
     private number(): void {
-        while(this.isDigit(this.peek())) this.advance();
+        while (this.isDigit(this.peek())) this.advance();
 
         // Look for a fractional part
-        if(this.peek() === '.' && this.isDigit(this.peekNext())) {
+        if (this.peek() === '.' && this.isDigit(this.peekNext())) {
             // Consume the "."
             this.advance();
-            
-            while(this.isDigit(this.peek())) this.advance();
+
+            while (this.isDigit(this.peek())) this.advance();
         }
 
         const value = parseFloat(this.source.substring(this.start, this.current));
@@ -156,14 +156,14 @@ export default class Scanner {
     }
 
     private peekNext(): string {
-        if(this.current + 1 >= this.source.length) return '\0';
+        if (this.current + 1 >= this.source.length) return '\0';
         return this.source.charAt(this.current + 1);
     }
 
     private isAlpha(char: string): boolean {
         return (char >= 'a' && char <= 'z') ||
-               (char >= 'A' && char <= 'Z') ||
-                char === '_';
+            (char >= 'A' && char <= 'Z') ||
+            char === '_';
     }
 
     private isAlphaNumeric(char: string): boolean {
@@ -171,11 +171,11 @@ export default class Scanner {
     }
 
     private identifier(): void {
-        while(this.isAlphaNumeric(this.peek())) this.advance();
+        while (this.isAlphaNumeric(this.peek())) this.advance();
 
         const text = this.source.substring(this.start, this.current);
         let type = keywords[text];
-        if(type === undefined) {
+        if (type === undefined) {
             type = TokenType.IDENTIFIER;
         }
         this.addToken(type);

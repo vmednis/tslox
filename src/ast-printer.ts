@@ -1,4 +1,4 @@
-import { Expr, type ExprVisitor} from "@/expr";
+import { Expr, type ExprVisitor } from "@/expr";
 
 export default class AstPrinter implements ExprVisitor<string> {
     print(expr: Expr): string {
@@ -19,7 +19,7 @@ export default class AstPrinter implements ExprVisitor<string> {
     }
 
     visitUnaryExpr(expr: Expr.Unary): string {
-        return this.parenthesize(expr.operator.lexeme,  expr.right);
+        return this.parenthesize(expr.operator.lexeme, expr.right);
     }
 
     private parenthesize(name: string, ...exprs: Expr[]): string {
