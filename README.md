@@ -8,14 +8,14 @@ I don't claim to be a TypeScript expert, so the code may not be perfectly idioma
 
 ## What is Lox?
 
-Lox is a dynamically-typed scripting language with a C-like syntax. It supports:
-- Variables and data types (numbers, strings, booleans, nil)
-- Arithmetic, comparison, and logical operators
-- Control flow (if/else, while, for)
-- Functions and closures
-- Classes and inheritance
+Lox is a dynamically-typed scripting language with a C-like syntax. This implementation currently supports:
+- **Data types**: numbers, strings, booleans, nil
+- **Expressions**: arithmetic, comparison, logical operators, grouping
+- **Variables**: declaration, assignment, and access
+- **Statements**: print statements, expression statements
+- **Block scoping**: lexical scoping with nested blocks
 
-This implementation currently covers the tree-walking interpreter portion of the book (chapters 1-13).
+Future chapters will add control flow, functions, classes, and inheritance.
 
 ## Prerequisites
 
@@ -60,18 +60,44 @@ Or after building:
 tslox path/to/script.lox
 ```
 
-### Example
+### Example Programs
 
 ```lox
-// Example Lox code
+// Example 1: Basic expressions
 print "Hello, world!";
+print (1 + 2) * 3;  // 9
+```
 
+```lox
+// Example 2: Variables
 var x = 10;
 var y = 20;
 print x + y;  // 30
 
-print (1 + 2) * 3;  // 9
+x = 15;
+print x;  // 15
 ```
+
+```lox
+// Example 3: Block scoping
+var a = "global a";
+var b = "global b";
+{
+  var a = "outer a";
+  var b = "outer b";
+  {
+    var a = "inner a";
+    print a;  // inner a
+    print b;  // outer b
+  }
+  print a;  // outer a
+  print b;  // outer b
+}
+print a;  // global a
+print b;  // global b
+```
+
+See the `test-lox/` directory for more example programs.
 
 ## Development
 
@@ -96,8 +122,8 @@ npm run generate-ast
 ```
 
 This script (`tool/generate-ast.ts`) will:
-- Generate `src/expr.ts` - Expression AST node classes (Binary, Grouping, Literal, Unary)
-- Generate `src/stmt.ts` - Statement AST node classes (Expression, Print)
+- Generate `src/expr.ts` - Expression AST node classes (Assign, Binary, Grouping, Literal, Unary, Variable)
+- Generate `src/stmt.ts` - Statement AST node classes (Block, Expression, Print, Var)
 
 **Note:** These files are auto-generated and should not be edited manually. Any changes will be overwritten the next time you run the generate script. If you need to add new expression or statement types, edit `tool/generate-ast.ts` instead.
 
@@ -112,13 +138,18 @@ tslox/
 │   ├── token.ts         # Token types and Token class
 │   ├── parser.ts        # Syntax analysis (parsing)
 │   ├── interpreter.ts   # Tree-walk interpreter and runtime
+│   ├── environment.ts   # Variable scope management
+│   ├── runtimeError.ts  # Runtime error class
 │   ├── expr.ts          # Expression AST nodes (auto-generated)
 │   └── stmt.ts          # Statement AST nodes (auto-generated)
 ├── tool/
 │   └── generate-ast.ts  # AST class generator
 ├── test-lox/            # Sample Lox programs
+│   ├── blocks.lox
 │   ├── language.lox
 │   └── single-double.lox
+├── tsconfig.json        # TypeScript configuration
+├── tsup.config.ts       # Build configuration
 └── package.json
 ```
 
@@ -127,6 +158,7 @@ tslox/
 1. **Scanner** (`scanner.ts`) - Performs lexical analysis, converting source code into tokens
 2. **Parser** (`parser.ts`) - Performs syntax analysis, converting tokens into an Abstract Syntax Tree (AST)
 3. **Interpreter** (`interpreter.ts`) - Walks the AST and executes the code using the Visitor pattern
+4. **Environment** (`environment.ts`) - Manages variable storage and lexical scoping
 
 The implementation uses the Visitor pattern extensively, which allows clean separation between the AST structure and the operations performed on it.
 
@@ -137,6 +169,22 @@ If you're interested in learning how interpreters work, I highly recommend readi
 The book is split into two parts:
 - **Part I (Chapters 1-13)**: Tree-walk interpreter in Java (this implementation)
 - **Part II (Chapters 14-30)**: Bytecode compiler and VM in C
+
+## Current Progress
+
+This implementation currently covers through Chapter 8 of Crafting Interpreters:
+- ✅ Chapter 4: Scanning
+- ✅ Chapter 5: Representing Code (AST generation)
+- ✅ Chapter 6: Parsing Expressions
+- ✅ Chapter 7: Evaluating Expressions
+- ✅ Chapter 8: Statements and State
+
+Still to implement:
+- ⬜ Chapter 9: Control Flow
+- ⬜ Chapter 10: Functions
+- ⬜ Chapter 11: Resolving and Binding
+- ⬜ Chapter 12: Classes
+- ⬜ Chapter 13: Inheritance
 
 ## License
 
