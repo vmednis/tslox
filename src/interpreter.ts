@@ -1,12 +1,19 @@
+import Environment from "./environment";
 import { Expr, ExprVisitor } from "./expr";
+import RuntimeError from "./runtimeError";
+import { Stmt, StmtVisitor } from "./stmt";
 import Token, { TokenType } from "./token";
 import TsLox from "./tslox";
 
-export default class Interpreter implements ExprVisitor<any> {
-    interpret(expr: Expr): void {
+export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
+    private environment = new Environment();
+    
+    interpret(statements: (Stmt | null)[]): void {
         try {
-            const value = this.evaluate(expr);
-            console.log(stringify(value));
+            for (const statement of statements) {
+                if(statement === null) continue;
+                this.execute(statement);
+            }
         } catch (error) {
             if (error instanceof RuntimeError) {
                 TsLox.runtimeError(error.token, error.message);
@@ -14,6 +21,34 @@ export default class Interpreter implements ExprVisitor<any> {
                 throw error;
             }
         }
+    }
+
+    visitExpressionStmt(stmt: Stmt.Expression): void {
+        this.evaluate(stmt.expr);
+    }
+
+    visitBlockStmt(stmt: Stmt.Block): void {
+        this.executeBlock(stmt.statements, new Environment(this.environment));
+    }
+
+    visitPrintStmt(stmt: Stmt.Print): void {
+        const value = this.evaluate(stmt.expr);
+        console.log(stringify(value));
+    }
+
+    visitVarStmt(stmt: Stmt.Var): void {
+        let value: any = null;
+        if (stmt.initializer !== null) {
+            value = this.evaluate(stmt.initializer);
+        }
+
+        this.environment.define(stmt.name.lexeme, value);
+    }
+
+    visitAssignExpr(expr: Expr.Assign) {
+        const value = this.evaluate(expr.value);
+        this.environment.assign(expr.name, value);
+        return value;
     }
 
     visitLiteralExpr(expr: Expr.Literal): any {
@@ -36,6 +71,10 @@ export default class Interpreter implements ExprVisitor<any> {
         }
 
         return null;
+    }
+
+    visitVariableExpr(expr: Expr.Variable) {
+        return this.environment.get(expr.name);
     }
 
     visitBinaryExpr(expr: Expr.Binary): any {
@@ -86,6 +125,23 @@ export default class Interpreter implements ExprVisitor<any> {
         return null;
     }
 
+    private execute(stmt: Stmt): void {
+        stmt.accept(this);
+    }
+
+    private executeBlock(statements: Stmt[], environment: Environment): void {
+        const previous = this.environment;
+        try {
+            this.environment = environment;
+
+            for (const statement of statements) {
+                this.execute(statement);
+            }
+        } finally {
+            this.environment = previous;
+        }
+    }
+
     private evaluate(expr: Expr): any {
         return expr.accept(this);
     }
@@ -129,10 +185,4 @@ function checkNumberOperands(operator: Token, left: any, right: any): void {
 function stringify(object: any): string {
     if (object === null) return "nil";
     return object.toString();
-}
-
-export class RuntimeError extends Error {
-    constructor(public readonly token: Token, message: string) {
-        super(message);
-    }
 }

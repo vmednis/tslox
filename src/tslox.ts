@@ -3,7 +3,6 @@ import { createInterface } from "readline/promises";
 import Scanner from "@/scanner";
 import Token, { TokenType } from "@/token";
 import Parser from "./parser";
-import AstPrinter from "./ast-printer";
 import Interpreter from "./interpreter";
 
 export default class TsLox {
@@ -64,12 +63,10 @@ export default class TsLox {
         const tokens = scanner.scanTokens();
 
         const parser = new Parser(tokens);
-        const expression = parser.parse();
+        const statements = parser.parse();
 
-        if (this.hadError || !expression) return;
-
-        console.log(new AstPrinter().print(expression));
-        this.interpreter.interpret(expression);
+        if (this.hadError || !statements) return;
+        this.interpreter.interpret(statements);
     }
 
     static scannerError(line: number, message: string) {

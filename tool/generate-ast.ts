@@ -10,11 +10,26 @@ if (args.length != 1) {
 const outputDir = args[0];
 
 await defineAst(outputDir, "Expr", [
+    "Assign -> name: Token, value: Expr",
     "Binary -> left: Expr, operator: Token, right: Expr",
     "Grouping -> expr: Expr",
     "Literal -> value: any",
     "Unary -> operator: Token, right: Expr",
+    "Variable -> name: Token",
 ], [{
+    import: 'Token',
+    from: '@/token'
+}]);
+
+await defineAst(outputDir, "Stmt", [
+    "Block -> statements: Stmt[]",
+    "Expression -> expr: Expr",
+    "Print -> expr: Expr",
+    "Var -> name: Token, initializer: Expr | null",
+], [{
+    import: '{ Expr }',
+    from: '@/expr'
+}, {
     import: 'Token',
     from: '@/token'
 }]);
