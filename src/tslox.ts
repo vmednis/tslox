@@ -4,9 +4,12 @@ import Scanner from "@/scanner";
 import Token, { TokenType } from "@/token";
 import Parser from "./parser";
 import AstPrinter from "./ast-printer";
+import Interpreter from "./interpreter";
 
 export default class TsLox {
+    static interpreter = new Interpreter();
     static hadError = false;
+    static hadRuntimeError = false;
 
     static async main() {
         console.log("TypeScript Lox Interpreter (Tree-Walking)");
@@ -30,6 +33,7 @@ export default class TsLox {
             this.run(contents);
 
             if (this.hadError) process.exit(65);
+            if (this.hadRuntimeError) process.exit(70);
         } catch (error) {
             console.error(`Error reading file: ${filePath}`);
             process.exit(74);
@@ -65,6 +69,7 @@ export default class TsLox {
         if (this.hadError || !expression) return;
 
         console.log(new AstPrinter().print(expression));
+        this.interpreter.interpret(expression);
     }
 
     static scannerError(line: number, message: string) {
@@ -77,6 +82,11 @@ export default class TsLox {
         } else {
             this.report(token.line, ` at '${token.lexeme}'`, message);
         }
+    }
+
+    static runtimeError(token: Token, message: string) {
+        console.error(`[line ${token.line}] Runtime Error at '${token.lexeme}': ${message}`);
+        this.hadRuntimeError = true;
     }
 
     private static report(line: number, where: string, message: string) {
