@@ -162,8 +162,8 @@ The implementation uses the Visitor pattern extensively, which allows clean sepa
 If you're interested in learning how interpreters work, I highly recommend reading [Crafting Interpreters](https://craftinginterpreters.com/). It's freely available online and does an excellent job of explaining language implementation from first principles.
 
 The book is split into two parts:
-- **Part I (Chapters 1-13)**: Tree-walk interpreter in Java (this implementation)
-- **Part II (Chapters 14-30)**: Bytecode compiler and VM in C
+- **Part I (Chapters 1-13)**: Tree-walk interpreter in Java (this implementation in TypeScript)
+- **Part II (Chapters 14-30)**: Bytecode compiler and VM in C (I plan to attempt this in Zig, despite never having used it before!)
 
 ## Current Progress
 
