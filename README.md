@@ -10,12 +10,14 @@ I don't claim to be a TypeScript expert, so the code may not be perfectly idioma
 
 Lox is a dynamically-typed scripting language with a C-like syntax. This implementation currently supports:
 - **Data types**: numbers, strings, booleans, nil
-- **Expressions**: arithmetic, comparison, logical operators, grouping
+- **Expressions**: arithmetic, comparison, logical operators (and/or), grouping
 - **Variables**: declaration, assignment, and access
 - **Statements**: print statements, expression statements
 - **Block scoping**: lexical scoping with nested blocks
+- **Control flow**: if/else statements, while loops, for loops
+- **Logical operators**: short-circuiting `and` and `or`
 
-Future chapters will add control flow, functions, classes, and inheritance.
+Future chapters will add functions, classes, and inheritance.
 
 ## Prerequisites
 
@@ -60,41 +62,31 @@ Or after building:
 tslox path/to/script.lox
 ```
 
-### Example Programs
+### Example Program
 
 ```lox
-// Example 1: Basic expressions
-print "Hello, world!";
-print (1 + 2) * 3;  // 9
-```
+// Fibonacci sequence with control flow
+var a = 0;
+var b = 1;
+var temp;
 
-```lox
-// Example 2: Variables
-var x = 10;
-var y = 20;
-print x + y;  // 30
+print "Fibonacci sequence:";
 
-x = 15;
-print x;  // 15
-```
-
-```lox
-// Example 3: Block scoping
-var a = "global a";
-var b = "global b";
-{
-  var a = "outer a";
-  var b = "outer b";
-  {
-    var a = "inner a";
-    print a;  // inner a
-    print b;  // outer b
+for (var i = 0; i < 10; i = i + 1) {
+  if (a < 100) {
+    print a;
+  } else {
+    print "Too large!";
   }
-  print a;  // outer a
-  print b;  // outer b
+  
+  temp = a;
+  a = b;
+  b = temp + b;
 }
-print a;  // global a
-print b;  // global b
+
+// Logical operators with short-circuiting
+var result = nil or "default value";
+print result;  // default value
 ```
 
 See the `test-lox/` directory for more example programs.
@@ -122,8 +114,8 @@ npm run generate-ast
 ```
 
 This script (`tool/generate-ast.ts`) will:
-- Generate `src/expr.ts` - Expression AST node classes (Assign, Binary, Grouping, Literal, Unary, Variable)
-- Generate `src/stmt.ts` - Statement AST node classes (Block, Expression, Print, Var)
+- Generate `src/expr.ts` - Expression AST node classes (Assign, Binary, Grouping, Literal, Logical, Unary, Variable)
+- Generate `src/stmt.ts` - Statement AST node classes (Block, Expression, If, Print, Var, While)
 
 **Note:** These files are auto-generated and should not be edited manually. Any changes will be overwritten the next time you run the generate script. If you need to add new expression or statement types, edit `tool/generate-ast.ts` instead.
 
@@ -145,9 +137,12 @@ tslox/
 ├── tool/
 │   └── generate-ast.ts  # AST class generator
 ├── test-lox/            # Sample Lox programs
-│   ├── blocks.lox
-│   ├── language.lox
-│   └── single-double.lox
+│   ├── blocks.lox       # Block scoping examples
+│   ├── branching.lox    # If/else and logical operators
+│   ├── for-fibonacci.lox # For loop example
+│   ├── language.lox     # Variable declarations
+│   ├── single-double.lox # Token scanning test
+│   └── while.lox        # While loop example
 ├── tsconfig.json        # TypeScript configuration
 ├── tsup.config.ts       # Build configuration
 └── package.json
@@ -172,15 +167,15 @@ The book is split into two parts:
 
 ## Current Progress
 
-This implementation currently covers through Chapter 8 of Crafting Interpreters:
+This implementation currently covers through Chapter 9 of Crafting Interpreters:
 - ✅ Chapter 4: Scanning
 - ✅ Chapter 5: Representing Code (AST generation)
 - ✅ Chapter 6: Parsing Expressions
 - ✅ Chapter 7: Evaluating Expressions
 - ✅ Chapter 8: Statements and State
+- ✅ Chapter 9: Control Flow
 
 Still to implement:
-- ⬜ Chapter 9: Control Flow
 - ⬜ Chapter 10: Functions
 - ⬜ Chapter 11: Resolving and Binding
 - ⬜ Chapter 12: Classes

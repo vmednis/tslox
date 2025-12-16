@@ -55,6 +55,20 @@ export abstract class Expr {
         }
     }
 
+    static Logical = class extends Expr {
+        constructor(
+            public readonly left: Expr,
+            public readonly operator: Token,
+            public readonly right: Expr
+        ) {
+            super();
+        }
+
+        accept<R>(visitor: ExprVisitor<R>): R {
+            return visitor.visitLogicalExpr(this);
+        }
+    }
+
     static Unary = class extends Expr {
         constructor(
             public readonly operator: Token,
@@ -88,6 +102,7 @@ export namespace Expr {
     export type Binary = InstanceType<typeof Expr.Binary>;
     export type Grouping = InstanceType<typeof Expr.Grouping>;
     export type Literal = InstanceType<typeof Expr.Literal>;
+    export type Logical = InstanceType<typeof Expr.Logical>;
     export type Unary = InstanceType<typeof Expr.Unary>;
     export type Variable = InstanceType<typeof Expr.Variable>;
 }
@@ -97,6 +112,7 @@ export interface ExprVisitor<R> {
     visitBinaryExpr(expr: Expr.Binary): R;
     visitGroupingExpr(expr: Expr.Grouping): R;
     visitLiteralExpr(expr: Expr.Literal): R;
+    visitLogicalExpr(expr: Expr.Logical): R;
     visitUnaryExpr(expr: Expr.Unary): R;
     visitVariableExpr(expr: Expr.Variable): R;
 }

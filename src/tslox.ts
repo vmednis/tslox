@@ -35,6 +35,7 @@ export default class TsLox {
             if (this.hadRuntimeError) process.exit(70);
         } catch (error) {
             console.error(`Error reading file: ${filePath}`);
+            console.log(error);
             process.exit(74);
         }
     }

@@ -14,6 +14,7 @@ await defineAst(outputDir, "Expr", [
     "Binary -> left: Expr, operator: Token, right: Expr",
     "Grouping -> expr: Expr",
     "Literal -> value: any",
+    "Logical -> left: Expr, operator: Token, right: Expr",
     "Unary -> operator: Token, right: Expr",
     "Variable -> name: Token",
 ], [{
@@ -24,8 +25,10 @@ await defineAst(outputDir, "Expr", [
 await defineAst(outputDir, "Stmt", [
     "Block -> statements: Stmt[]",
     "Expression -> expr: Expr",
+    "If -> condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
     "Print -> expr: Expr",
     "Var -> name: Token, initializer: Expr | null",
+    "While -> condition: Expr, body: Stmt",
 ], [{
     import: '{ Expr }',
     from: '@/expr'

@@ -1,0 +1,7 @@
+var x = 1;
+if (x >= 0) {
+    print "positive";
+} else print "negative";
+
+print "short" or 2;
+print nil or "circut";

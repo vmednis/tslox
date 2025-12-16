@@ -7,11 +7,11 @@ import TsLox from "./tslox";
 
 export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     private environment = new Environment();
-    
+
     interpret(statements: (Stmt | null)[]): void {
         try {
             for (const statement of statements) {
-                if(statement === null) continue;
+                if (statement === null) continue;
                 this.execute(statement);
             }
         } catch (error) {
@@ -25,6 +25,14 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
 
     visitExpressionStmt(stmt: Stmt.Expression): void {
         this.evaluate(stmt.expr);
+    }
+
+    visitIfStmt(stmt: Stmt.If): void {
+        if (isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.thenBranch);
+        } else if (stmt.elseBranch !== null) {
+            this.execute(stmt.elseBranch);
+        }
     }
 
     visitBlockStmt(stmt: Stmt.Block): void {
@@ -45,6 +53,12 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
         this.environment.define(stmt.name.lexeme, value);
     }
 
+    visitWhileStmt(stmt: Stmt.While): void {
+        while (isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.body);
+        }
+    }
+
     visitAssignExpr(expr: Expr.Assign) {
         const value = this.evaluate(expr.value);
         this.environment.assign(expr.name, value);
@@ -53,6 +67,18 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
 
     visitLiteralExpr(expr: Expr.Literal): any {
         return expr.value;
+    }
+
+    visitLogicalExpr(expr: Expr.Logical) {
+        const left = this.evaluate(expr.left);
+
+        if (expr.operator.type === TokenType.OR) {
+            if (isTruthy(left)) return left;
+        } else {
+            if (!isTruthy(left)) return left;
+        }
+
+        return this.evaluate(expr.right);
     }
 
     visitGroupingExpr(expr: Expr.Grouping): any {
