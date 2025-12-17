@@ -29,6 +29,20 @@ export abstract class Stmt {
         }
     }
 
+    static Function = class extends Stmt {
+        constructor(
+            public readonly name: Token,
+            public readonly params: Token[],
+            public readonly body: Stmt[]
+        ) {
+            super();
+        }
+
+        accept<R>(visitor: StmtVisitor<R>): R {
+            return visitor.visitFunctionStmt(this);
+        }
+    }
+
     static If = class extends Stmt {
         constructor(
             public readonly condition: Expr,
@@ -52,6 +66,19 @@ export abstract class Stmt {
 
         accept<R>(visitor: StmtVisitor<R>): R {
             return visitor.visitPrintStmt(this);
+        }
+    }
+
+    static Return = class extends Stmt {
+        constructor(
+            public readonly keyword: Token,
+            public readonly value: Expr | null
+        ) {
+            super();
+        }
+
+        accept<R>(visitor: StmtVisitor<R>): R {
+            return visitor.visitReturnStmt(this);
         }
     }
 
@@ -87,8 +114,10 @@ export abstract class Stmt {
 export namespace Stmt {
     export type Block = InstanceType<typeof Stmt.Block>;
     export type Expression = InstanceType<typeof Stmt.Expression>;
+    export type Function = InstanceType<typeof Stmt.Function>;
     export type If = InstanceType<typeof Stmt.If>;
     export type Print = InstanceType<typeof Stmt.Print>;
+    export type Return = InstanceType<typeof Stmt.Return>;
     export type Var = InstanceType<typeof Stmt.Var>;
     export type While = InstanceType<typeof Stmt.While>;
 }
@@ -96,8 +125,10 @@ export namespace Stmt {
 export interface StmtVisitor<R> {
     visitBlockStmt(stmt: Stmt.Block): R;
     visitExpressionStmt(stmt: Stmt.Expression): R;
+    visitFunctionStmt(stmt: Stmt.Function): R;
     visitIfStmt(stmt: Stmt.If): R;
     visitPrintStmt(stmt: Stmt.Print): R;
+    visitReturnStmt(stmt: Stmt.Return): R;
     visitVarStmt(stmt: Stmt.Var): R;
     visitWhileStmt(stmt: Stmt.While): R;
 }

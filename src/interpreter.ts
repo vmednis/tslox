@@ -5,9 +5,11 @@ import { Stmt, StmtVisitor } from "@/stmt";
 import Token, { TokenType } from "@/token";
 import TsLox from "@/tslox"
 import LoxCallable, { isLoxCallable } from "@/loxCallable";
+import LoxFunction from "@/loxFunction";
+import Return from "@/return";
 
 export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
-    private readonly globals = new Environment();
+    readonly globals = new Environment();
     private environment = this.globals;
 
     constructor() {
@@ -41,6 +43,11 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
         }
     }
 
+    visitFunctionStmt(stmt: Stmt.Function): void {
+        const func = new LoxFunction(stmt, this.environment);
+        this.environment.define(stmt.name.lexeme, func);
+    }
+
     visitExpressionStmt(stmt: Stmt.Expression): void {
         this.evaluate(stmt.expr);
     }
@@ -60,6 +67,15 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
     visitPrintStmt(stmt: Stmt.Print): void {
         const value = this.evaluate(stmt.expr);
         console.log(stringify(value));
+    }
+
+    visitReturnStmt(stmt: Stmt.Return): void {
+        let value = null;
+        if (stmt.value !== null) {
+            value = this.evaluate(stmt.value);
+        }
+
+        throw new Return(value);
     }
 
     visitVarStmt(stmt: Stmt.Var): void {
@@ -188,11 +204,11 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
         return func.call(this, args);
     }
 
-    private execute(stmt: Stmt): void {
+    execute(stmt: Stmt): void {
         stmt.accept(this);
     }
 
-    private executeBlock(statements: Stmt[], environment: Environment): void {
+    executeBlock(statements: Stmt[], environment: Environment): void {
         const previous = this.environment;
         try {
             this.environment = environment;
@@ -205,7 +221,7 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
         }
     }
 
-    private evaluate(expr: Expr): any {
+    evaluate(expr: Expr): any {
         return expr.accept(this);
     }
 }

@@ -26,8 +26,10 @@ await defineAst(outputDir, "Expr", [
 await defineAst(outputDir, "Stmt", [
     "Block -> statements: Stmt[]",
     "Expression -> expr: Expr",
+    "Function -> name: Token, params: Token[], body: Stmt[]",
     "If -> condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
     "Print -> expr: Expr",
+    "Return -> keyword: Token, value: Expr | null",
     "Var -> name: Token, initializer: Expr | null",
     "While -> condition: Expr, body: Stmt",
 ], [{

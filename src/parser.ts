@@ -22,6 +22,10 @@ export default class Parser {
 
     private decleration(): Stmt | null {
         try {
+            if(this.match(TokenType.FUN)) {
+                return this.function("function");
+            }
+
             if (this.match(TokenType.VAR)) {
                 return this.varDeclaration();
             }
@@ -46,6 +50,9 @@ export default class Parser {
         }
         if (this.match(TokenType.PRINT)) {
             return this.printStatement();
+        }
+        if (this.match(TokenType.RETURN)) {
+            return this.returnStatement();
         }
         if (this.match(TokenType.WHILE)) {
             return this.whileStatement();
@@ -118,6 +125,17 @@ export default class Parser {
         return new Stmt.Print(value);
     }
 
+    private returnStatement(): Stmt {
+        const keyword = this.previous();
+        let value: Expr | null = null;
+        if (!this.check(TokenType.SEMICOLON)) {
+            value = this.expression();
+        }
+
+        this.consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value);
+    }
+
     private varDeclaration(): Stmt {
         const name = this.consume(TokenType.IDENTIFIER, "Expect variable name.");
 
@@ -143,6 +161,27 @@ export default class Parser {
         const expr = this.expression();
         this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(expr);
+    }
+
+    private function(kind: String): Stmt {
+        const name = this.consume(TokenType.IDENTIFIER, `Expect %{kind} name.`);
+
+        this.consume(TokenType.LEFT_PAREN, `Expect '(' after ${kind} name.`);
+        const params = [];
+        if (!this.check(TokenType.RIGHT_PAREN)) {
+            do {
+                if (params.length >= 255) {
+                    this.error(this.peek(), "Can't have more than 255 paremenetrs.");
+                }
+
+                params.push(this.consume(TokenType.IDENTIFIER, "Expect parementer name."));
+            } while (this.match(TokenType.COMMA));
+        }
+        this.consume(TokenType.RIGHT_PAREN, "Expect ') after parameters.");
+
+        this.consume(TokenType.LEFT_BRACE, "Expect '{' before ${kind} body.");
+        const body = this.block();
+        return new Stmt.Function(name, params, body);
     }
 
     private block(): Stmt[] {
