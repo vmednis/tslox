@@ -9,7 +9,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/main.ts",
-    "generate-ast": "tsx tool/generate-ast.ts src"
+    "generate-ast": "tsx tool/generate-ast.ts src",
+    "wc": "find src -name '*.ts' -exec wc -l {} + | sort -n -r"
   },
   "keywords": [],
   "author": "",
