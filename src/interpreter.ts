@@ -1,12 +1,30 @@
-import Environment from "./environment";
-import { Expr, ExprVisitor } from "./expr";
-import RuntimeError from "./runtimeError";
-import { Stmt, StmtVisitor } from "./stmt";
-import Token, { TokenType } from "./token";
-import TsLox from "./tslox";
+import Environment from "@/environment";
+import { Expr, ExprVisitor } from "@/expr";
+import RuntimeError from "@/runtimeError";
+import { Stmt, StmtVisitor } from "@/stmt";
+import Token, { TokenType } from "@/token";
+import TsLox from "@/tslox"
+import LoxCallable, { isLoxCallable } from "@/loxCallable";
 
 export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
-    private environment = new Environment();
+    private readonly globals = new Environment();
+    private environment = this.globals;
+
+    constructor() {
+        this.globals.define("clock", new class implements LoxCallable {
+            arity(): number {
+                return 0;
+            };
+
+            call(interpreter: Interpreter, args: any[]): number {
+                return Date.now() / 1000.0;
+            };
+
+            toString(): string {
+                return "<native fn>";
+            }
+        }());
+    }
 
     interpret(statements: (Stmt | null)[]): void {
         try {
@@ -149,6 +167,25 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
         }
 
         return null;
+    }
+
+    visitCallExpr(expr: Expr.Call): any {
+        const callee = this.evaluate(expr.callee);
+
+        let args = [];
+        for(const arg of expr.args) {
+            args.push(this.evaluate(arg));
+        }
+
+        if (!isLoxCallable(callee)) {
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+        const func = callee as LoxCallable;
+        if (args.length !== func.arity()) {
+            throw new RuntimeError(expr.paren, `Expected ${func.arity()} arguments but got ${args.length}.`);
+        }
+
+        return func.call(this, args);
     }
 
     private execute(stmt: Stmt): void {

@@ -2,8 +2,8 @@ import { readFile } from "fs/promises";
 import { createInterface } from "readline/promises";
 import Scanner from "@/scanner";
 import Token, { TokenType } from "@/token";
-import Parser from "./parser";
-import Interpreter from "./interpreter";
+import Parser from "@/parser";
+import Interpreter from "@/interpreter";
 
 export default class TsLox {
     static interpreter = new Interpreter();

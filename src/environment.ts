@@ -1,5 +1,5 @@
-import RuntimeError from "./runtimeError";
-import Token from "./token";
+import RuntimeError from "@/runtimeError";
+import Token from "@/token";
 
 export default class Environment {
     private values: Map<string, any> = new Map();

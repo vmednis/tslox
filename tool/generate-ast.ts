@@ -12,6 +12,7 @@ const outputDir = args[0];
 await defineAst(outputDir, "Expr", [
     "Assign -> name: Token, value: Expr",
     "Binary -> left: Expr, operator: Token, right: Expr",
+    "Call -> callee: Expr, paren: Token, args: Expr[]",
     "Grouping -> expr: Expr",
     "Literal -> value: any",
     "Logical -> left: Expr, operator: Token, right: Expr",

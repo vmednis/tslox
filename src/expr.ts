@@ -31,6 +31,20 @@ export abstract class Expr {
         }
     }
 
+    static Call = class extends Expr {
+        constructor(
+            public readonly callee: Expr,
+            public readonly paren: Token,
+            public readonly args: Expr[]
+        ) {
+            super();
+        }
+
+        accept<R>(visitor: ExprVisitor<R>): R {
+            return visitor.visitCallExpr(this);
+        }
+    }
+
     static Grouping = class extends Expr {
         constructor(
             public readonly expr: Expr
@@ -100,6 +114,7 @@ export abstract class Expr {
 export namespace Expr {
     export type Assign = InstanceType<typeof Expr.Assign>;
     export type Binary = InstanceType<typeof Expr.Binary>;
+    export type Call = InstanceType<typeof Expr.Call>;
     export type Grouping = InstanceType<typeof Expr.Grouping>;
     export type Literal = InstanceType<typeof Expr.Literal>;
     export type Logical = InstanceType<typeof Expr.Logical>;
@@ -110,6 +125,7 @@ export namespace Expr {
 export interface ExprVisitor<R> {
     visitAssignExpr(expr: Expr.Assign): R;
     visitBinaryExpr(expr: Expr.Binary): R;
+    visitCallExpr(expr: Expr.Call): R;
     visitGroupingExpr(expr: Expr.Grouping): R;
     visitLiteralExpr(expr: Expr.Literal): R;
     visitLogicalExpr(expr: Expr.Logical): R;

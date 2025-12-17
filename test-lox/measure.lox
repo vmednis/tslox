@@ -1,0 +1,11 @@
+var startTime = clock();
+var x = 0;
+for(var i = 0; i < 1000000; i = i + 1) {
+    x = x + i;
+}
+var endTime = clock();
+
+print "Result:";
+print x;
+print "Took:";
+print endTime - startTime;
