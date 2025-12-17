@@ -4,6 +4,7 @@ import Scanner from "@/scanner";
 import Token, { TokenType } from "@/token";
 import Parser from "@/parser";
 import Interpreter from "@/interpreter";
+import Resolver from "@/resolver";
 
 export default class TsLox {
     static interpreter = new Interpreter();
@@ -67,6 +68,12 @@ export default class TsLox {
         const statements = parser.parse();
 
         if (this.hadError || !statements) return;
+
+        const resolver = new Resolver(this.interpreter);
+        resolver.resolveStmts(statements);
+
+        if (this.hadError) return;
+
         this.interpreter.interpret(statements);
     }
 

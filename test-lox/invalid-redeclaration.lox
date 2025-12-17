@@ -1,0 +1,8 @@
+fun cantDoThis(a) {
+    var b = a;
+    var b = a;
+
+    return b;
+}
+
+print cantDoThis(1);

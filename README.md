@@ -19,8 +19,9 @@ Lox is a dynamically-typed scripting language with a C-like syntax. This impleme
 - **Functions**: first-class functions with closures
 - **Return statements**: early returns from functions
 - **Native functions**: built-in `clock()` function
+- **Static analysis**: variable resolution and binding to prevent common scoping errors
 
-Future chapters will add garbage collection, classes, and inheritance.
+Future chapters will add classes and inheritance.
 
 ## Prerequisites
 
@@ -136,34 +137,38 @@ This script (`tool/generate-ast.ts`) will:
 ```
 tslox/
 ├── src/
-│   ├── main.ts          # Entry point
-│   ├── tslox.ts         # Main interpreter class and error handling
-│   ├── scanner.ts       # Lexical analysis (tokenization)
-│   ├── token.ts         # Token types and Token class
-│   ├── parser.ts        # Syntax analysis (parsing)
-│   ├── interpreter.ts   # Tree-walk interpreter and runtime
-│   ├── environment.ts   # Variable scope management
-│   ├── loxCallable.ts   # Callable interface and type guard
-│   ├── loxFunction.ts   # Function implementation with closures
-│   ├── runtimeError.ts  # Runtime error class
-│   ├── return.ts        # Return exception for control flow
-│   ├── expr.ts          # Expression AST nodes (auto-generated)
-│   └── stmt.ts          # Statement AST nodes (auto-generated)
+│   ├── main.ts                   # Entry point
+│   ├── tslox.ts                  # Main interpreter class and error handling
+│   ├── scanner.ts                # Lexical analysis (tokenization)
+│   ├── token.ts                  # Token types and Token class
+│   ├── parser.ts                 # Syntax analysis (parsing)
+│   ├── resolver.ts               # Static variable resolution and binding
+│   ├── interpreter.ts            # Tree-walk interpreter and runtime
+│   ├── environment.ts            # Variable scope management
+│   ├── loxCallable.ts            # Callable interface and type guard
+│   ├── loxFunction.ts            # Function implementation with closures
+│   ├── runtimeError.ts           # Runtime error class
+│   ├── return.ts                 # Return exception for control flow
+│   ├── expr.ts                   # Expression AST nodes (auto-generated)
+│   └── stmt.ts                   # Statement AST nodes (auto-generated)
 ├── tool/
-│   └── generate-ast.ts  # AST class generator
-├── test-lox/            # Sample Lox programs
-│   ├── blocks.lox       # Block scoping examples
-│   ├── branching.lox    # If/else and logical operators
-│   ├── closures.lox     # Closure examples
-│   ├── for-fibonacci.lox # For loop Fibonacci
-│   ├── fun-fibonacci.lox # Recursive Fibonacci
-│   ├── hi-functions.lox # Function declaration examples
-│   ├── language.lox     # Variable declarations
-│   ├── measure.lox      # Performance measurement
-│   ├── single-double.lox # Token scanning test
-│   └── while.lox        # While loop example
-├── tsconfig.json        # TypeScript configuration
-├── tsup.config.ts       # Build configuration
+│   └── generate-ast.ts           # AST class generator
+├── test-lox/                     # Sample Lox programs
+│   ├── blocks.lox                # Block scoping examples
+│   ├── branching.lox             # If/else and logical operators
+│   ├── closure-scoping.lox       # Closure scoping test
+│   ├── closures.lox              # Closure examples
+│   ├── for-fibonacci.lox         # For loop Fibonacci
+│   ├── fun-fibonacci.lox         # Recursive Fibonacci
+│   ├── hi-functions.lox          # Function declaration examples
+│   ├── invalid-redeclaration.lox # Error: variable redeclaration
+│   ├── invalid-return.lox        # Error: top-level return
+│   ├── language.lox              # Variable declarations
+│   ├── measure.lox               # Performance measurement
+│   ├── single-double.lox         # Token scanning test
+│   └── while.lox                 # While loop example
+├── tsconfig.json                 # TypeScript configuration
+├── tsup.config.ts                # Build configuration
 └── package.json
 ```
 
@@ -171,9 +176,10 @@ tslox/
 
 1. **Scanner** (`scanner.ts`) - Performs lexical analysis, converting source code into tokens
 2. **Parser** (`parser.ts`) - Performs syntax analysis, converting tokens into an Abstract Syntax Tree (AST)
-3. **Interpreter** (`interpreter.ts`) - Walks the AST and executes the code using the Visitor pattern
-4. **Environment** (`environment.ts`) - Manages variable storage and lexical scoping with support for closures
-5. **LoxFunction** (`loxFunction.ts`) - Implements callable functions that capture their lexical environment
+3. **Resolver** (`resolver.ts`) - Performs static analysis to resolve variable bindings and catch semantic errors before runtime
+4. **Interpreter** (`interpreter.ts`) - Walks the AST and executes the code using the Visitor pattern
+5. **Environment** (`environment.ts`) - Manages variable storage and lexical scoping with support for closures
+6. **LoxFunction** (`loxFunction.ts`) - Implements callable functions that capture their lexical environment
 
 The implementation uses the Visitor pattern extensively, which allows clean separation between the AST structure and the operations performed on it.
 
@@ -187,7 +193,7 @@ The book is split into two parts:
 
 ## Current Progress
 
-This implementation currently covers through Chapter 10 of Crafting Interpreters:
+This implementation currently covers through Chapter 11 of Crafting Interpreters:
 - ✅ Chapter 4: Scanning
 - ✅ Chapter 5: Representing Code (AST generation)
 - ✅ Chapter 6: Parsing Expressions
@@ -195,9 +201,9 @@ This implementation currently covers through Chapter 10 of Crafting Interpreters
 - ✅ Chapter 8: Statements and State
 - ✅ Chapter 9: Control Flow
 - ✅ Chapter 10: Functions
+- ✅ Chapter 11: Resolving and Binding
 
 Still to implement:
-- ⬜ Chapter 11: Resolving and Binding
 - ⬜ Chapter 12: Classes
 - ⬜ Chapter 13: Inheritance
 

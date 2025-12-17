@@ -11,6 +11,7 @@ import Return from "@/return";
 export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> {
     readonly globals = new Environment();
     private environment = this.globals;
+    private readonly locals: Map<Expr, number> = new Map();
 
     constructor() {
         this.globals.define("clock", new class implements LoxCallable {
@@ -95,7 +96,14 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
 
     visitAssignExpr(expr: Expr.Assign) {
         const value = this.evaluate(expr.value);
-        this.environment.assign(expr.name, value);
+        
+        const distance = this.locals.get(expr);
+        if (distance !== undefined) {
+            this.environment.assignAt(distance, expr.name.lexeme, value);
+        } else {
+            this.globals.assign(expr.name, value);
+        }
+
         return value;
     }
 
@@ -134,7 +142,16 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
     }
 
     visitVariableExpr(expr: Expr.Variable) {
-        return this.environment.get(expr.name);
+        return this.lookUpVariable(expr);
+    }
+
+    lookUpVariable(expr: Expr.Variable): any {
+        const distance = this.locals.get(expr);
+        if (distance !== undefined) {
+            return this.environment.getAt(distance, expr.name.lexeme);
+        } else {
+            return this.globals.get(expr.name);
+        }
     }
 
     visitBinaryExpr(expr: Expr.Binary): any {
@@ -202,6 +219,10 @@ export default class Interpreter implements ExprVisitor<any>, StmtVisitor<void> 
         }
 
         return func.call(this, args);
+    }
+
+    resolve(expr: Expr, depth: number): void {
+        this.locals.set(expr, depth);
     }
 
     execute(stmt: Stmt): void {
