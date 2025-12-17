@@ -16,8 +16,11 @@ Lox is a dynamically-typed scripting language with a C-like syntax. This impleme
 - **Block scoping**: lexical scoping with nested blocks
 - **Control flow**: if/else statements, while loops, for loops
 - **Logical operators**: short-circuiting `and` and `or`
+- **Functions**: first-class functions with closures
+- **Return statements**: early returns from functions
+- **Native functions**: built-in `clock()` function
 
-Future chapters will add functions, classes, and inheritance.
+Future chapters will add garbage collection, classes, and inheritance.
 
 ## Prerequisites
 
@@ -65,28 +68,37 @@ tslox path/to/script.lox
 ### Example Program
 
 ```lox
-// Fibonacci sequence with control flow
-var a = 0;
-var b = 1;
-var temp;
-
-print "Fibonacci sequence:";
-
-for (var i = 0; i < 10; i = i + 1) {
-  if (a < 100) {
-    print a;
-  } else {
-    print "Too large!";
+// Functions with closures
+fun makeCounter() {
+  var count = 0;
+  
+  fun increment() {
+    count = count + 1;
+    print count;
   }
   
-  temp = a;
-  a = b;
-  b = temp + b;
+  return increment;
 }
 
-// Logical operators with short-circuiting
-var result = nil or "default value";
-print result;  // default value
+var counter = makeCounter();
+counter();  // 1
+counter();  // 2
+counter();  // 3
+
+// Recursive Fibonacci
+fun fib(n) {
+  if (n <= 1) return n;
+  return fib(n - 2) + fib(n - 1);
+}
+
+for (var i = 0; i < 10; i = i + 1) {
+  print fib(i);
+}
+
+// Native functions
+var start = clock();
+// ... do work ...
+print "Elapsed: " + (clock() - start);
 ```
 
 See the `test-lox/` directory for more example programs.
@@ -131,7 +143,10 @@ tslox/
 │   ├── parser.ts        # Syntax analysis (parsing)
 │   ├── interpreter.ts   # Tree-walk interpreter and runtime
 │   ├── environment.ts   # Variable scope management
+│   ├── loxCallable.ts   # Callable interface and type guard
+│   ├── loxFunction.ts   # Function implementation with closures
 │   ├── runtimeError.ts  # Runtime error class
+│   ├── return.ts        # Return exception for control flow
 │   ├── expr.ts          # Expression AST nodes (auto-generated)
 │   └── stmt.ts          # Statement AST nodes (auto-generated)
 ├── tool/
@@ -139,8 +154,12 @@ tslox/
 ├── test-lox/            # Sample Lox programs
 │   ├── blocks.lox       # Block scoping examples
 │   ├── branching.lox    # If/else and logical operators
-│   ├── for-fibonacci.lox # For loop example
+│   ├── closures.lox     # Closure examples
+│   ├── for-fibonacci.lox # For loop Fibonacci
+│   ├── fun-fibonacci.lox # Recursive Fibonacci
+│   ├── hi-functions.lox # Function declaration examples
 │   ├── language.lox     # Variable declarations
+│   ├── measure.lox      # Performance measurement
 │   ├── single-double.lox # Token scanning test
 │   └── while.lox        # While loop example
 ├── tsconfig.json        # TypeScript configuration
@@ -153,7 +172,8 @@ tslox/
 1. **Scanner** (`scanner.ts`) - Performs lexical analysis, converting source code into tokens
 2. **Parser** (`parser.ts`) - Performs syntax analysis, converting tokens into an Abstract Syntax Tree (AST)
 3. **Interpreter** (`interpreter.ts`) - Walks the AST and executes the code using the Visitor pattern
-4. **Environment** (`environment.ts`) - Manages variable storage and lexical scoping
+4. **Environment** (`environment.ts`) - Manages variable storage and lexical scoping with support for closures
+5. **LoxFunction** (`loxFunction.ts`) - Implements callable functions that capture their lexical environment
 
 The implementation uses the Visitor pattern extensively, which allows clean separation between the AST structure and the operations performed on it.
 
@@ -167,16 +187,16 @@ The book is split into two parts:
 
 ## Current Progress
 
-This implementation currently covers through Chapter 9 of Crafting Interpreters:
+This implementation currently covers through Chapter 10 of Crafting Interpreters:
 - ✅ Chapter 4: Scanning
 - ✅ Chapter 5: Representing Code (AST generation)
 - ✅ Chapter 6: Parsing Expressions
 - ✅ Chapter 7: Evaluating Expressions
 - ✅ Chapter 8: Statements and State
 - ✅ Chapter 9: Control Flow
+- ✅ Chapter 10: Functions
 
 Still to implement:
-- ⬜ Chapter 10: Functions
 - ⬜ Chapter 11: Resolving and Binding
 - ⬜ Chapter 12: Classes
 - ⬜ Chapter 13: Inheritance
